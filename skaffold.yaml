@@ -18,3 +18,19 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: haidranoid/ticketing-client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
+    - image: haidranoid/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.js'
+            dest: .

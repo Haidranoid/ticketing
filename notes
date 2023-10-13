@@ -7,3 +7,16 @@ http://localhost:8222/streaming/channelsz?subs=1
 
 common -> first time publish
 npm publish --access public
+
+
+deploy to cluster
+- create cluster on Digitial Ocean
+- download doctl
+- doctl auth init
+  #promp api key
+- doctl kubernetes cluster kubeconfig save ticketing
+  # kubectl get nodes
+- kubectl config view
+
+to change to local cluster :
+- kubectl config use-context docker-desktop

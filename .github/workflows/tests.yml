@@ -7,8 +7,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: cd auth && npm install
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build project
+        run: cd auth && npm install
   test:
     name: Test
     runs-on: ubuntu-latest

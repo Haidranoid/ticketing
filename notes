@@ -1,1 +1,9 @@
 kubectl create secret generic jwt-secret --from-literal=JWT_KEY=asdf
+kubectl port-forward [pod-name] [port:port]
+
+NATS
+http://localhost:8222/streaming
+http://localhost:8222/streaming/channelsz?subs=1
+
+common -> first time publish
+npm publish --access public

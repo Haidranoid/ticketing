@@ -4,9 +4,11 @@ import {
   validateRequest,
   NotFoundError,
   requireAuth,
-  NotAuthorizedError
+  NotAuthorizedError, BadRequestError
 } from "@hn-tickets/common";
 import {Ticket} from "../../models/ticket";
+import {TicketUpdatedPublisher} from "../events/publishers/ticket-updated-publisher";
+import {natsWrapper} from "../nats-wrapper";
 
 const router = express.Router()
 
@@ -24,24 +26,36 @@ router.put(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-  const ticket = await Ticket.findById(req.params.id);
+    const ticket = await Ticket.findById(req.params.id);
 
-  if (!ticket){
-    throw new NotFoundError()
-  }
+    if (!ticket) {
+      throw new NotFoundError()
+    }
 
-  if (ticket.userId !== req.currentUser?.id){
-    throw new NotAuthorizedError()
-  }
+    if (ticket.orderId){
+      throw new BadRequestError('Cannot edit a reserved ticket')
+    }
 
-  ticket.set({
-    title: req.body.title,
-    price: req.body.price
-  });
+    if (ticket.userId !== req.currentUser?.id) {
+      throw new NotAuthorizedError()
+    }
 
-  await ticket.save()
+    ticket.set({
+      title: req.body.title,
+      price: req.body.price
+    });
 
-  res.send(ticket)
-})
+    await ticket.save()
+
+    await new TicketUpdatedPublisher(natsWrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+      version: ticket.version,
+    })
+
+    res.send(ticket)
+  })
 
 export {router as updateTicketRouter}
